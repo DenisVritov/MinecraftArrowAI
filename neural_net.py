@@ -10,13 +10,13 @@ from sklearn.model_selection import ParameterGrid
 import pandas as pd
 
 if __name__ == '__main__':
-    datafile = open('1k_data.txt', 'r')
+    datafile = open('1kdata/1k_data.txt', 'r')
     samples = []
     for line in datafile:
         samples.append([float(i) for i in line.split()])
     del(samples[85])
 
-    labelfile = open('1k_labels.txt', 'r')
+    labelfile = open('1kdata/1k_labels.txt', 'r')
     pitch = []
     for line in labelfile:
         pitch.append([float(i) for i in line.split()])
