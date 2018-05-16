@@ -1,0 +1,13 @@
+# CONFIGS
+databases.conf
+exchanges.conf
+
+# LOGS
+*.log
+
+# SWAP FILES
+*.swp
+*.swo
+
+# COMPILED FILES
+__pycache__/
