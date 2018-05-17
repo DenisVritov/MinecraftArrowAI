@@ -106,7 +106,7 @@ def check_hit_obs(x_arr, h_arr, obs):
     for ob in obs:
         p1_ob = ob[0]
         p2_ob = list(ob[1])
-        p2_ob[1] = p2_ob[1]+0.5
+        p2_ob[1] = p2_ob[1] + 0.5
         if intersect(p1_arr, p2_arr, p1_ob, p2_ob):
             return True
     return False

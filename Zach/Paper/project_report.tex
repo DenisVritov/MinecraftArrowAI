@@ -1,0 +1,246 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Journal Article
+% LaTeX Template
+% Version 1.4 (15/5/16)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com) with extensive modifications by
+% Vel (vel@LaTeXTemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[twoside,twocolumn]{article}
+
+\usepackage{blindtext} % Package to generate dummy text throughout this template 
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+\usepackage[english]{babel} % Language hyphenation and typographical rules
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+
+\usepackage{enumitem} % Customized lists
+\setlist[itemize]{noitemsep} % Make itemize lists more compact
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\roman{subsection}} % roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{Running title $\bullet$ May 2016 $\bullet$ Vol. XXI, No. 1} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+\usepackage{titling} % Customizing the title section
+
+\usepackage{hyperref} % For hyperlinks in the PDF
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\setlength{\droptitle}{-4\baselineskip} % Move the title up
+
+\pretitle{\begin{center}\Huge\bfseries} % Article title formatting
+\posttitle{\end{center}} % Article title closing formatting
+\title{Modeling Physical Phenomenon via Machine Learning} % Article title
+\author{%
+\textsc{Zachary Tanenbaum, Denis Virtov}\thanks{A special thanks to our adviser Vitaly Kuznetsov} \\[1ex] % Your name
+\normalsize New York University \\ % Your institution
+\normalsize \href{mailto:zachtanenbaum@gmail.com}{zachtanenbaum@gmail.com}, \href{mailto:dv989@nyu.edu}{dv989@nyu.edu} % Your email address
+%\and % Uncomment if 2 authors are required, duplicate these 4 lines if more
+%\textsc{Jane Smith}\thanks{Corresponding author} \\[1ex] % Second author's name
+%\normalsize University of Utah \\ % Second author's institution
+%\normalsize \href{mailto:jane@smith.com}{jane@smith.com} % Second author's email address
+}
+\date{\today} % Leave empty to omit a date
+\renewcommand{\maketitlehookd}{%
+\begin{abstract}
+\noindent 
+We'll do this part last!
+\blindtext % Dummy abstract text - replace \blindtext with your abstract text
+\end{abstract}
+}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+% Print the title
+\maketitle
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\section{Introduction}
+
+\lettrine[nindent=0em,lines=3]{O}utline for the introduction.
+Explain the goal of the project.
+The reasoning we chose this topic.
+Why it is important.
+Why machine learning is a good answer to our problems.
+(exp. Simulation is extremely expensive for some tasks, saved time and money viewing from observations instead of deriving solutions [assuming sparse learning works])
+
+Explain that we approached the problem by using Minecraft as an "unknown" physical universe. (Drag, Vo of the Arrow, Initial y position of the arrow [1.62m higher than the block the player is standing], gravitational constant)
+Explain the coordinate system of minecraft (negative pitch, positive z is south [double check that], etc).
+Explain the units of measurement (block = 1 meter) and time (tick = 1/20th Second).
+Explain what the heck is projectile motion.
+
+While we know the various hidden metrics of projectile motion in Minecraft the machine learning model does not and will have to learn these parameters.
+Explain that we used project Malmo to simplify the communication between our models and Minecraft.
+
+
+%------------------------------------------------
+
+\section{Methods}
+
+Explain the simplification of the problem from a 3D problem into a 2D problem by turning the XZ plan into radial coordinates and a XZ - Y plane to model the projectile motion.
+Explain how pitch, yaw and force play a part in projectile motion.
+
+Explain the approach to getting the data. (Using project malmo, teleporting around and determining random targets)
+How we wanted to make inputs similar to information a singular person will have standing in this world would have.
+The different features we considered in using in our dataset. (Elaborate and why we would want a feature, Such as, the relative position of the target from the player. The absolution position of the target.)
+The features we decided to use in our dataset. (We decided to not use the absolute position of the target from the player as that information is encoded in the relative position of the target. Using all relative positions allows the model to learn Minecraft's measurement of distance [Block] and maybe learn Minecraft's measurement of time [Tick].)
+
+Show and explain graphs of the plotted data.
+'Hittable' vs 'Non-Hittable'
+Linear shape of fully drawn shots that hit.
+Explain why we split the data into 'Hittable' and 'Non-Hittable' (See if we can predict this)
+Explain why we split the data into 'Fully draw bows' and 'Varying draw strength'
+
+State we created a simulator for arrows shot in Minecraft for the below and what the simulator actually does.
+
+Explain how we determined the error/constraint metrics.
+If the model got the same pitch/yaw/force as the simulator (Terrible metric and why. The model could be providing similar, but not exact specs, that still hit the target.)
+Difference of the pitch/yaw/force of the model to the simulator. (Terrible metric and why. Huge outliers that might still hit the target.)
+Distance of arrow to center of the target. (Good metric and why.)
+
+Go through each method tested starting with linear systems.
+How we used ridge regression to find different parameters.
+Hypothesized that yaw was non-linear due to the use of tanh in it's equation.
+Hypothesized that with full force shots the underlying function is probably linear to an extent (remember drag!). Otherwise, it will probably be non-linear.
+
+Talk about how we used an SVC to determine if a target is hitable or not.
+Talk about the hypothesis that the SVC will probably not do much given the prior graph on the matter (Hitable vs Non-hitable)
+
+Go through non-linear systems using Random Forest and why we believe these will perform better than the ridge regression solutions.
+
+Go through the neural network systems and explain why we're testing these.
+
+\begin{itemize}
+\item Example of multiple bullet points
+\item Curabitur feugiat
+\item turpis sed auctor facilisis
+\item arcu eros accumsan lorem, at posuere mi diam sit amet tortor
+\item Fusce fermentum, mi sit amet euismod rutrum
+\item sem lorem molestie diam, iaculis aliquet sapien tortor non nisi
+\item Pellentesque bibendum pretium aliquet
+\end{itemize}
+\blindtext % Dummy text
+
+Example of text that needs a footnote.\footnote{Said footnote}.
+
+%------------------------------------------------
+
+\section{Results}
+How some parameters were assumed to be non-linear and provided terrible results with just linear systems.
+How adding non-linear kernels in Ridge regression helped but did not provide a complete/adequate solution.
+
+Speak about the results of the SVC to determine hitable and non-hitable.
+
+Speak about the results of the Random Forest models.
+
+Speak about the results of the NNs.
+
+Speak about how the model found some solutions that were better than the simulator.
+
+\begin{table}
+\caption{Example table}
+\centering
+\begin{tabular}{llr}
+\toprule
+\multicolumn{2}{c}{Name} \\
+\cmidrule(r){1-2}
+First name & Last Name & Grade \\
+\midrule
+John & Doe & $7.5$ \\
+Richard & Miles & $2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\blindtext % Dummy text
+
+\begin{equation}
+\label{eq:emc}
+e = mc^2
+\end{equation}
+
+\blindtext % Dummy text
+
+%------------------------------------------------
+
+\section{Discussion}
+
+We are pleased with the results and have automated the player using our models.
+First, use the SVC model to determine if a target is hitable or not. If it is hitable, use the NN to determine the pitch, yaw and force.
+
+Speak about how we would suggest approaching similar circumstances where machine learning can aid in finding hidden physical functions.
+
+Suggest future work. Such as determining projectile motion on different planets/video games.
+
+\subsection{Subsection One}
+
+A statement requiring citation \cite{Figueredo:2009dg}.
+\blindtext % Dummy text
+
+\subsection{Subsection Two}
+
+\blindtext % Dummy text
+
+%----------------------------------------------------------------------------------------
+%	REFERENCE LIST
+%----------------------------------------------------------------------------------------
+
+\begin{thebibliography}{99} % Bibliography - this is intentionally simple in this template
+
+The two reddit users and links to their accounts (for the equations)
+Project malmo github page
+Rosenberg's Github because he taught the class (and is awesome)
+Raise fits in triumph due to completion of paper.
+
+\newblock Assortative pairing and life history strategy - a cross-cultural
+  study.
+\newblock {\em Human Nature}, 20:317--330.
+ 
+\end{thebibliography}
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
