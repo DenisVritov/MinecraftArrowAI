@@ -1,0 +1,29 @@
+50 training point:
+
+Fraction of shots hit 0.13861386138613863
+Average distance of missed shots 3.105250066765733
+Median distance of missed shots 2.7559753610329616
+
+100 training points:
+
+Fraction of shots hit 0.15841584158415842
+Average distance of missed shots 1.577648431174921
+Median distance of missed shots 1.3644324755014359
+
+500 training points:
+
+Fraction of shots hit 0.3564356435643564
+Average distance of missed shots 1.12378055838264
+Median distance of missed shots 0.8818719167360953
+
+1000 training points:
+
+Fraction of shots hit 0.33663366336633666
+Average distance of missed shots 1.050653626216016
+Median distance of missed shots 0.6787972529140784
+
+18000 training points:
+
+Fraction of shots hit 0.42574257425742573
+Average distance of missed shots 0.7801160546025884
+Median distance of missed shots 0.3079447400569404
