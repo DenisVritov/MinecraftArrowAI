@@ -30,6 +30,7 @@ from util.spawning import find_con_spawn
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import train_test_split
 import pandas as pd
+from sklearn.svm import SVC
 
 import MalmoPython
 import os
@@ -143,26 +144,52 @@ mh_headers = ['x', 'y', 'z', 'dist', 'height']
 mh = pd.DataFrame(data_mh_list, columns=mh_headers)
 mhl = label.join(mh)
 
+hitable_groups = mhl.groupby(lambda x: 'Hitable' if mhl.iloc[x]['f'] != 0 else 'Unhitable')
+mhl_hit = hitable_groups.get_group('Hitable')
+mhl_unhit = hitable_groups.get_group('Unhitable')
+
+mhf = mhl.groupby('f').get_group(1.0) # Max Force only allows hitable
+hitable = mhl['f'].mask(mhl['f'] > 0, 1)
+
+X = mhl[['x', 'y', 'z', 'dist', 'height']]
+X_train, X_test, y_train, y_test = train_test_split(X[:15000],
+                                                    hitable[:15000],
+                                                    test_size=0.1,
+                                                    random_state=42)
+
+svc = SVC(gamma=0.1, kernel='rbf')
+svc.fit(X_train, y_train)
+
 cols = ['y', 'dist', 'height']
-target_distance = pd.DataFrame(np.sqrt(np.square(mhl['x']) + np.square(mhl['z'])), columns=['target_distance'])
-X = pd.concat([target_distance, mhl[cols]], axis=1)
-y = mhl[['f', 'pitch']]
+target_distance = pd.DataFrame(np.sqrt(np.square(mhl_hit['x']) + np.square(mhl_hit['z'])), columns=['target_distance'])
+X = pd.concat([target_distance, mhl_hit[cols]], axis=1)
+y = mhl_hit[['f', 'pitch']]
 
 # X = X.head(500)
 # y = y.head(500)
 
 X_train, X_test, y_train, y_test = train_test_split(X,
                                                     y,
-                                                    test_size=0.33,
-                                                    random_state=42)
+                                                    test_size=0.1,
+                                                    random_state=69)
 
 mlr = MLPRegressor(activation='logistic', tol=1e-6, solver='lbfgs', random_state=1, alpha=10,
-                   hidden_layer_sizes=(70,))
+                   hidden_layer_sizes=(50,30))
+
+#X_train = X_train.head(1000)
+#y_train = y_train.head(1000)
+
+train_mean = X_train.mean()
+train_std = X_train.std()
+print(train_mean.values, train_std.values)
+X_train = (X_train - train_mean)/train_std
+
 mlr.fit(X_train, y_train)
 print('Predictor Trained')
 
 
 # Continually do the mission
+shots = 100
 hit_targets = 0
 total_shots = 0
 missed_distance = []
@@ -212,6 +239,8 @@ while True:
     count = 1
     grid = None
     while world_state.is_mission_running:
+        if total_shots > shots:
+            break
         if world_state.observations and grid is None:
             tar_block = 'diamond_block'
             obvsCube = world_state.observations[0].text
@@ -222,28 +251,38 @@ while True:
             obstacles = np.asarray(obstacles)
             tallest = np.argmax(obstacles, axis=0)
             tallest_obj = obstacles[tallest[1]]
-            X = np.asarray([dist] + [ty] + [tallest_obj[0]] + [tallest_obj[1]]).reshape(1,-1)
-            preds = mlr.predict(X)
-            print(preds)
-            f = preds[0][0]
-            pitch = preds[0][1]
-            if f > 1:
-                f = 1
-            v0 = (2*f) + (f)**2
-            t_to_target = dist/(v0*math.cos(math.radians(-1*pitch)))
-            arr_h = 1.62 + v0*math.sin(math.radians(-1*pitch))*t_to_target - 0.025*(t_to_target)**2
-            print(ty,arr_h)
-#            con_x, con_y, con_z = find_target_coords(grid_map, tar_block, obx, oby, obz)
+            X = np.asarray([tx] + [ty] + [tz] + [tallest_obj[0]] + [tallest_obj[1]])
+            if svc.predict(X.reshape(1,-1))[0] == 1:
+                X = np.asarray([dist] + [ty] + [tallest_obj[0]] + [tallest_obj[1]])
+                X = (X - train_mean)/train_std
+                preds = mlr.predict(X.reshape(1,-1))
+                print(preds)
+                f = preds[0][0]
+                pitch = preds[0][1]
+                if f > 1:
+                    f = 1
+                v0 = (2*f) + (f)**2
+                #arr_h = sim_shot(-1 * pitch, f, dist, ty, ty+1, obs, image)
+
+                t_to_target = dist/(v0*math.cos(math.radians(-1*pitch)))
+                arr_h = 1.62 + v0*math.sin(math.radians(-1*pitch))*t_to_target - 0.025*(t_to_target)**2
+                print(ty,arr_h)
+                #atan_eq = math.atan2(v0**2 - math.sqrt(v0**4 - 0.05*(0.05*dist**2 + 2 * (ty-1.52) * v0**2)),0.05*dist)
+                #print(-1*pitch, math.degrees(atan_eq))
+                #con_x, con_y, con_z = find_target_coords(grid_map, tar_block, obx, oby, obz)
+            else:
+                print('Not Hittable')
+                count -= 1
 
         if world_state.number_of_observations_since_last_state > 0:
             obvsText = world_state.observations[-1].text
             data = json.loads(obvsText) # observation comes in as a JSON string...
-            if point_to(agent_host, data, preds[0][1], yaw, 0.1) and count > 0: # pitch is not None and
+            if point_to(agent_host, data, pitch, yaw, 0.1) and count > 0: # pitch is not None and
                 count -= 1
-
+                
                 agent_host.sendCommand('use 1')
                 print('Shooting...')
-                time.sleep(preds[0][0])
+                time.sleep(f)
                 print('Shot...')
                 agent_host.sendCommand('use 0')
 
@@ -267,3 +306,7 @@ while True:
     print()
     print("Mission ended")
 
+# t_to_target = math.log((1 - (0.01*(dist/(v0*math.cos(math.radians(-1*pitch)))))), 0.99) + 1
+#             print(t_to_target)
+#             arr_h = 1.52 + v0*math.sin(math.radians(-1*pitch))*(0.99**t_to_target) - 0.05*((1-(0.99**(t_to_target-1)))/0.01)
+#             print(ty+0.5,arr_h)
